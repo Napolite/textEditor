@@ -1,10 +1,8 @@
 use crossterm::cursor::{Hide, MoveTo, Show};
-use crossterm::execute;
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode, size, Clear, ClearType};
 use crossterm::{queue, style::Print};
 use std::io::{stdout, Error, Write};
 
-pub struct Terminal;
 
 #[derive(Copy, Clone)]
 pub struct Size {
@@ -18,12 +16,16 @@ pub struct Position{
     pub y:u16,
 }
 
+pub struct Terminal;
+
+
 impl Terminal {
     pub fn initialize() -> Result<(), Error> {
         enable_raw_mode().unwrap();
         Self::clear_screen()?;
         Self::move_cursor_to(Position{x:0, y:0})?;
-        Self.execute()?;
+        Self::execute()?;
+        Ok(())
     }
 
     pub fn execute()->Result<(), Error>{
@@ -61,19 +63,19 @@ impl Terminal {
         Ok(())
     }
 
-    pub fn show_cursor() -> Result<() Error>{
+    pub fn show_cursor() -> Result<(), Error>{
         queue!(stdout(), Show)?;
 
         Ok(())
     }
 
     pub fn size() -> Result<Size, Error> {
-        let (width, height) = size();
+        let (width, height) = size()?;
 
         Ok(Size {height, width})
     }
 
-    pub fn print(string: &str) -> Result((), Error){
+    pub fn print(string: &str) -> Result<(), Error>{
         queue!(stdout(), Print(string))?;
 
         Ok(())

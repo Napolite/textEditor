@@ -1,7 +1,7 @@
 use crossterm::event::{read, Event, Event::Key, KeyCode::Char, KeyEvent, KeyModifiers};
 mod terminal;
 
-use terminal::Terminal;
+use terminal::{Terminal, Size, Position};
 
 pub struct Editor {
     should_quit: bool,
@@ -36,26 +36,30 @@ impl Editor {
     }
 
     fn draw_tildes() -> Result<(), std::io::Error> {
-        let height = Terminal::size()?.1;
+        let Size{height, ..}= Terminal::size()?;
 
         for c_row in 0..height {
-            print!("~");
+            Terminal::clear_line()?;
+            Terminal::print("~")?;
 
             if c_row + 1 < height {
-                print!("\r\n");
+                Terminal::print("\r\n")?;
             }
         }
         Ok(())
     }
 
     fn refresh_screen(&self) -> Result<(), std::io::Error> {
+        Terminal::hide_cursor()?;
         if self.should_quit {
             Terminal::clear_screen()?;
-            print!("Goodbye! \r");
+            Terminal::print("Goodbye! \r")?;
         } else {
-            Self::draw_tildes()?;
-            Terminal::move_cursor_to(0, 0)?;
-        }
+            Self::draw_tildes()?;    
+            Terminal::move_cursor_to(Position{x:0, y:0})?;
+    }
+        Terminal::show_cursor()?;
+        Terminal::execute()?;
 
         Ok(())
     }
